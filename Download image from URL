@@ -1,0 +1,62 @@
+ private boolean isReadStorageAllowed() {
+        //Getting the permission status
+        int result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        //If permission is granted returning true
+        if (result == PackageManager.PERMISSION_GRANTED)
+            return true;
+
+        //If permission is not granted returning false
+        return false;
+    }
+
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            return;
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        }
+        //And finally ask for the permission
+        ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+    }
+    
+    
+     final BasicImageDownloader downloader = new BasicImageDownloader(new BasicImageDownloader.OnImageLoaderListener() {
+                            @Override
+                            public void onError(BasicImageDownloader.ImageError error) {
+                                Toast.makeText(context, "Error code " + error.getErrorCode() + ": " +
+                                        error.getMessage(), Toast.LENGTH_LONG).show();
+                                error.printStackTrace();
+                            }
+
+                            @Override
+                            public void onProgressChange(int percent) {
+                            }
+
+                            @Override
+                            public void onComplete(Bitmap result) {
+                                /* save the image - I'm gonna use JPEG */
+                                final Bitmap.CompressFormat mFormat = Bitmap.CompressFormat.JPEG;
+                                /* don't forget to include the extension into the file name */
+                                final File myImageFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                                        File.separator + "Apex Event" + File.separator + name + "." + mFormat.name().toLowerCase());
+                                BasicImageDownloader.writeToDisk(myImageFile, result, new BasicImageDownloader.OnBitmapSaveListener() {
+                                    @Override
+                                    public void onBitmapSaved() {
+                                        Toast.makeText(context, "Image saved as: " + myImageFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onBitmapSaveError(BasicImageDownloader.ImageError error) {
+                                        Toast.makeText(context, "Error code " + error.getErrorCode() + ": " +
+                                                error.getMessage(), Toast.LENGTH_LONG).show();
+                                        error.printStackTrace();
+                                    }
+
+
+                                }, mFormat, false);
+
+
+                            }
+                        });
+                        downloader.download(feedLists.get(position).getFeedImage(), true);
