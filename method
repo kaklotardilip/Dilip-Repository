@@ -1,0 +1,107 @@
+    public void requestCall_Login(String email, final String password, String push_token, String device_type, String badge_code) {
+        progressDialog.show();
+
+        Call<MainResponseModel> call = api.requestLogin(email, password, push_token, device_type, "", "");
+
+        call.enqueue(new Callback<MainResponseModel>() {
+            @Override
+            public void onResponse(Call<MainResponseModel> call, Response<MainResponseModel> response) {
+                progressDialog.dismiss();
+
+                if (response.isSuccessful()){
+                    MainResponseModel loginResponseModel = response.body();
+                    Log.e("Login-->>", "Status : " + loginResponseModel.getStatus());
+                    Log.e("Login-->>", "Message : " + loginResponseModel.getMessage());
+                    if (loginResponseModel.getStatus().equalsIgnoreCase("200")) {
+
+                        if (loginResponseModel.getLoginData().getRoleId() == 2 || loginResponseModel.getLoginData().getRoleId() == 3) {
+                            preference.setIsLoggedIn(true);
+
+                            Log.e("Login-->>", "**********************************Data from login response*******************************");
+                            Log.e("Login-->>", "User ID : " + loginResponseModel.getLoginData().getUserId());
+                            Log.e("Login-->>", "Email : " + loginResponseModel.getLoginData().getEmail());
+                            Log.e("Login-->>", "name : " + loginResponseModel.getLoginData().getName());
+                            Log.e("Login-->>", "Role ID : " + loginResponseModel.getLoginData().getRoleId());
+                            Log.e("Login-->>", "Description : " + loginResponseModel.getLoginData().getBio());
+                            Log.e("Login-->>", "Profile Image : " + loginResponseModel.getLoginData().getProfile());
+                            Log.e("Login-->>", "Mobile No : " + loginResponseModel.getLoginData().getMobile());
+                            Log.e("Login-->>", "It department : " + loginResponseModel.getLoginData().getITdepartment());
+                            Log.e("Login-->>", "Manual Code : " + loginResponseModel.getLoginData().getManualCode());
+                            Log.e("Login-->>", "Access Token : " + loginResponseModel.getLoginData().getAccessToken());
+
+                            String b = new String(loginResponseModel.getLoginData().getAccessToken());
+
+                            StringBuilder str = new StringBuilder(b);
+                            Log.e("", "string = " + str);
+
+                            // insert character at offset 8
+                            str.insert(7, "a82");
+
+                            String accessToken = str.toString();
+
+                            preference.setAccessToken(accessToken);
+
+
+                      /*  String b = loginResponseModel.getLoginData().getAccessToken();
+
+                        StringBuilder str = new StringBuilder(b);
+                        Log.e("", "string = " + str);
+
+                        str.insert(7, "a19");
+
+                        String accessToken = str.toString();
+
+                        preference.setAccessToken(accessToken);*/
+
+                            Log.e("", "After insertion = " + preference.getAccessToken());
+
+
+                            preference.setUser_ID(String.valueOf(loginResponseModel.getLoginData().getUserId()));
+                            preference.setAdminId(String.valueOf(loginResponseModel.getLoginData().getAdminId()));
+                            preference.setRole_ID(String.valueOf(loginResponseModel.getLoginData().getRoleId()));
+                            preference.setBadgeCode(loginResponseModel.getLoginData().getManualCode());
+                            preference.setProfileImage(loginResponseModel.getLoginData().getProfile());
+                            preference.setUserCompanyName(loginResponseModel.getLoginData().getCompanyName());
+                            preference.setUserFirstName(loginResponseModel.getLoginData().getFirstName());
+                            preference.setUserLastName(loginResponseModel.getLoginData().getLastName());
+                            preference.setUserPhone(loginResponseModel.getLoginData().getMobile());
+                            preference.setUserPosition(loginResponseModel.getLoginData().getPosition());
+                            preference.setUserDesc(loginResponseModel.getLoginData().getBio());
+                            preference.setWebsiteLink(loginResponseModel.getLoginData().getWebsite());
+                            preference.setFBLink(loginResponseModel.getLoginData().getFbLink());
+                            preference.setTwitterLink(loginResponseModel.getLoginData().getTwitterLink());
+                            preference.setLinkedInLink(loginResponseModel.getLoginData().getLinkedinLink());
+                            preference.setITdepartment(loginResponseModel.getLoginData().getITdepartment());
+                            preference.setUserReports(loginResponseModel.getLoginData().getReports());
+                            preference.setCompanyID(loginResponseModel.getLoginData().getCompanyId());
+                            preference.setEmail(loginResponseModel.getLoginData().getEmail());
+
+                            Drift.logout();
+                            Drift.registerUser(String.valueOf(loginResponseModel.getLoginData().getUserId()), loginResponseModel.getLoginData().getEmail());
+
+                            Intent intent = new Intent(LoginActivity.this, EventlistActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "You are not a valid user!", Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    } else {
+                        commonUtils.snackBar(llLoginLayout, loginResponseModel.getMessage());
+                    }
+                }
+                else {
+                    commonUtils.snackBar(llLoginLayout, "Failed to login!");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<MainResponseModel> call, Throwable t) {
+                progressDialog.dismiss();
+
+                commonUtils.snackBar(llLoginLayout, "Failed to login!");
+            }
+        });
+    }
