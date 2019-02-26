@@ -1,0 +1,81 @@
+public class ConnectionClass {
+
+    public Gson gson;
+    public Retrofit retrofit;
+    public ApexEventApi api;
+    public OkHttpClient okHttpClient;
+
+    public ConnectionClass() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .create();
+        okHttpClient = new OkHttpClient().newBuilder()
+                .addInterceptor(logging)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request original = chain.request();
+
+                        Request request = original.newBuilder()
+                                .header("Xapi", "jwZryPtnDm5WFpmDhl2o750G5gVFVSYhpXbg7tlmO78a")
+                                .method(original.method(), original.body())
+                                .build();
+                        return chain.proceed(request);
+                    }
+                })
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .build();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(END_POINT)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        api = retrofit.create(ApexEventApi.class);
+    }
+
+    public ConnectionClass(Context context) {
+        final AppPreferences preferences = new AppPreferences(context);
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .create();
+        okHttpClient = new OkHttpClient().newBuilder()
+                .addInterceptor(logging)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request original = chain.request();
+
+                        Request request = original.newBuilder()
+                           
+                                .header("Id", preferences.getUser_ID())
+                                .method(original.method(), original.body())
+                                .build();
+
+                        Log.e("accessToken: ",preferences.getAccessToken());
+                        Log.e("Id: ",preferences.getUser_ID());
+
+                        return chain.proceed(request);
+                    }
+                })
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES)
+                .writeTimeout(1, TimeUnit.MINUTES)
+                .build();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(END_POINT)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+        api = retrofit.create(ApexEventApi.class);
+    }
