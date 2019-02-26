@@ -1,0 +1,28 @@
+public class AppPreferences {
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
+    public AppPreferences(Context context) {
+        preferences = context.getSharedPreferences("CIOsynergyAdmin", Context.MODE_PRIVATE);
+        editor = preferences.edit();
+
+
+    }
+
+    public void setIsRememberMe(boolean isRememberMe) {
+        editor.putBoolean("is_remember_me", isRememberMe);
+        editor.apply();
+    }
+
+    public boolean getIsRememberMe() {
+        return preferences.getBoolean("is_remember_me", false);
+    }
+  public void setRememberUser(String user_name) {
+        editor.putString("remember_user", user_name);
+        editor.apply();
+    }
+
+    public String getRememberUser() {
+        return preferences.getString("remember_user", null);
+    }
+}
