@@ -1,0 +1,139 @@
+package com.quipglobal.CIOsynergyAdmin.AgendaModule;
+
+import android.app.AlarmManager;
+import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.quipglobal.CIOsynergyAdmin.AgendaModule.Model.Agenda;
+import com.quipglobal.CIOsynergyAdmin.ApiModel.ApexEventApi;
+import com.quipglobal.CIOsynergyAdmin.EventDetailModule.EventDetailActivity;
+import com.quipglobal.CIOsynergyAdmin.Preferences.AppPreferences;
+import com.quipglobal.CIOsynergyAdmin.R;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.ContentValues.TAG;
+
+public class AgendaListAdapter extends RecyclerView.Adapter<AgendaListAdapter.ViewHolder> {
+    List<Agenda> agendaList;
+    public ArrayList<Agenda> search_List = new ArrayList<>();
+    ArrayList<Agenda> arrayList;
+    Context mcontext;
+    Dialog dialog;
+    ApexEventApi api;
+    AppPreferences preferences;
+    LayoutInflater vi;
+
+    int i;
+
+    public AgendaListAdapter(Context context) {
+
+        this.mcontext = context;
+        agendaList = new ArrayList<>();
+        this.arrayList = new ArrayList<Agenda>();
+        this.arrayList.addAll(agendaList);
+
+    }
+
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.agenda_singleitem_view, parent, false);
+
+        return new ViewHolder(itemView);
+
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        holder.bindData(agendaList.get(position));
+        preferences = new AppPreferences(mcontext);
+    }
+
+    public void add(Agenda r) {
+        agendaList.add(r);
+
+        notifyItemInserted(agendaList.size() - 1);
+    }
+
+
+    public void addAll(List<Agenda> moveResults) {
+        for (Agenda result : moveResults) {
+            add(result);
+        }
+    }
+
+    public void clear() {
+        agendaList.clear();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return agendaList == null ? 0 : agendaList.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView tv_from_time, tv_agenda_title, tv_agenda_discription;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            tv_from_time =  itemView.findViewById(R.id.textView_agenda_event_list_from_time);
+            tv_agenda_title =  itemView.findViewById(R.id.textView_agenda_event_list_single_item_title);
+            tv_agenda_discription =  itemView.findViewById(R.id.textView_agenda_event_list_single_item_discription);
+        }
+
+        public void bindData(Agenda number) {
+            tv_from_time.setText(number.getFromTime()+" To "+number.getToTime());
+            tv_agenda_title.setText(number.getTitle());
+            tv_agenda_discription.setText(number.getDescription());
+        }
+    }
+
+
+    public void filter(String charText) {
+        charText = charText.toLowerCase(Locale.getDefault());
+        agendaList.clear();
+        search_List.clear();
+        if (charText.length() == 0) {
+            agendaList.addAll(arrayList);
+        } else {
+            for (Agenda sp : arrayList) {
+                if (sp.getTitle().toLowerCase(Locale.getDefault()).contains(charText)) {
+                    agendaList.add(sp);
+                    search_List.add(sp);
+                }
+            }
+
+        }
+        notifyDataSetChanged();
+    }
+
+}
