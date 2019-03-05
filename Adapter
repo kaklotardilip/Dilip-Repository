@@ -137,3 +137,7 @@ public class AgendaListAdapter extends RecyclerView.Adapter<AgendaListAdapter.Vi
     }
 
 }
+
+
+ List<Agenda> agenda = mainResponseModel.getListagendasAdminData().getAgendas();
+                                agendaListAdapter.addAll(agenda);
