@@ -139,5 +139,13 @@ private LinearLayout parentLinearLayout;
     public void onDelete(View v) {
         parentLinearLayout.removeView((View) v.getParent());
     }
-        
+       
+       
+       
+       
+       
+       
+       Other wise use this link
+       
+       https://www.androidtutorialpoint.com/basics/dynamically-add-and-remove-views-in-android/
         
