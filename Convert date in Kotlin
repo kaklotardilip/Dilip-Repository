@@ -1,0 +1,19 @@
+
+    fun parseDateToddMMyyyy(time: String): String? {
+        val inputPattern = "yyyy-MM-dd HH:mm:ss"
+        val outputPattern = "dd - MMM - yyyy"
+        val inputFormat = SimpleDateFormat(inputPattern)
+        val outputFormat = SimpleDateFormat(outputPattern)
+
+        var date: Date? = null
+        var str: String? = null
+
+        try {
+            date = inputFormat.parse(time)
+            str = outputFormat.format(date)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        }
+
+        return str
+    }
